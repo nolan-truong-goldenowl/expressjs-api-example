@@ -1,7 +1,11 @@
 const express = require('express');
 const { validate } = require('express-validation');
 const postController = require('../../controllers/post.controller');
-const { createPostValidation } = require('../../validations/post.validation');
+const {
+  createPostValidation,
+  updatePostValidation,
+  removePostValidation,
+} = require('../../validations/post.validation');
 
 const router = express.Router();
 
@@ -16,5 +20,13 @@ router.route('/')
 // GET /api/posts/:id
 router.route('/:id')
   .get(postController.showPost);
+
+// PATCH /api/posts/:id
+router.route('/:id')
+  .patch(validate(updatePostValidation, { keyByField: true }), postController.updatePost);
+
+// DELETE /api/posts/:id
+router.route('/:id')
+  .delete(validate(removePostValidation, { keyByField: true }), postController.removePost);
 
 module.exports = router;

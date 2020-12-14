@@ -17,7 +17,7 @@ exports.listPost = async (req, res, next) => {
         .limit(pagiOptions.pageSize),
     ]);
 
-    res.json(pagiOptions.paginate(postCollectionSerializer(posts), total));
+    res.json(pagiOptions.paginate(postCollectionSerializer(posts), total.length));
   } catch (error) {
     next(error);
   }
@@ -45,6 +45,30 @@ exports.showPost = async (req, res, next) => {
       });
     }
     res.json(postSerializer(post));
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updatePost = async (req, res, next) => {
+  try {
+    await Post.updateOne({
+      _id: req.params.id,
+    }, req.body);
+
+    res.json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.removePost = async (req, res, next) => {
+  try {
+    await Post.deleteOne({
+      _id: req.params.id,
+    });
+
+    res.json();
   } catch (error) {
     next(error);
   }
