@@ -1,12 +1,23 @@
 const httpStatus = require('http-status');
 const APIError = require('../utils/APIError');
+const Pagination = require('../utils/Pagination');
 const Post = require('../models/post.model');
 const { postSerializer, postCollectionSerializer } = require('../serializers/post.serializer');
 
 exports.listPost = async (req, res, next) => {
   try {
-    const posts = await Post.find();
-    res.json(postCollectionSerializer(posts));
+    const pagiOptions = new Pagination(req.query);
+
+    const [total, posts] = await Promise.all([
+      Post
+        .find(),
+      Post
+        .find()
+        .skip(pagiOptions.skipCount)
+        .limit(pagiOptions.pageSize),
+    ]);
+
+    res.json(pagiOptions.paginate(postCollectionSerializer(posts), total));
   } catch (error) {
     next(error);
   }
