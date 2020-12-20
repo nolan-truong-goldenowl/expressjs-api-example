@@ -10,14 +10,17 @@ exports.listPost = async (req, res, next) => {
 
     const [total, posts] = await Promise.all([
       Post
-        .find(),
+        .countDocuments(),
       Post
         .find()
         .skip(pagiOptions.skipCount)
         .limit(pagiOptions.pageSize),
     ]);
 
-    res.json(pagiOptions.paginate(postCollectionSerializer(posts), total.length));
+    res.json({
+      posts: postCollectionSerializer(posts),
+      meta: pagiOptions.paginate(posts, total),
+    });
   } catch (error) {
     next(error);
   }
@@ -28,8 +31,11 @@ exports.createPost = async (req, res, next) => {
     const post = new Post(req.body);
     const savedPost = await post.save();
 
-    res.json(postSerializer(savedPost));
+    res
+      .status(httpStatus.CREATED)
+      .json(postSerializer(savedPost));
   } catch (error) {
+    error.statusCode = httpStatus[422];
     next(error);
   }
 };
@@ -40,10 +46,11 @@ exports.showPost = async (req, res, next) => {
 
     if (!post) {
       throw new APIError({
-        status: httpStatus.NOT_FOUND,
         message: 'Post not found',
+        status: httpStatus.NOT_FOUND,
       });
     }
+
     res.json(postSerializer(post));
   } catch (error) {
     next(error);
@@ -52,12 +59,13 @@ exports.showPost = async (req, res, next) => {
 
 exports.updatePost = async (req, res, next) => {
   try {
-    await Post.updateOne({
+    const updatedPost = await Post.updateOne({
       _id: req.params.id,
     }, req.body);
 
-    res.json();
+    res.json(postSerializer(updatedPost));
   } catch (error) {
+    error.statusCode = httpStatus[422];
     next(error);
   }
 };
@@ -68,8 +76,9 @@ exports.removePost = async (req, res, next) => {
       _id: req.params.id,
     });
 
-    res.json();
+    res.json({ post: { id: req.params.id } });
   } catch (error) {
+    error.statusCode = httpStatus[422];
     next(error);
   }
 };

@@ -15,13 +15,10 @@ class Pagination {
     this.count = items.length;
 
     return {
-      items,
-      pagination: {
-        page: this.page,
-        count: this.count,
-        total: this.total,
-        pageSize: this.pageSize,
-      },
+      page: this.page,
+      count: this.count,
+      total: this.total,
+      pageSize: this.pageSize,
     };
   }
 }

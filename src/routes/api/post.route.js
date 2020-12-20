@@ -17,15 +17,15 @@ router.route('/')
 router.route('/')
   .post(validate(createPostValidation, { keyByField: true }), postController.createPost);
 
-// GET /api/posts/:id
+// GET /api/post/:id
 router.route('/:id')
   .get(postController.showPost);
 
-// PATCH /api/posts/:id
+// PATCH /api/post/:id
 router.route('/:id')
   .patch(validate(updatePostValidation, { keyByField: true }), postController.updatePost);
 
-// DELETE /api/posts/:id
+// DELETE /api/post/:id
 router.route('/:id')
   .delete(validate(removePostValidation, { keyByField: true }), postController.removePost);
 
